@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Employability Skills Mock Test</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --surface: #1e293b;
+                --text: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border: #334155;
+                --primary-light: #312e81;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+        .screen { display: none; animation: fadeIn 0.3s ease; min-height: 100vh; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 24px 20px 32px;
+            border-radius: 0 0 var(--radius) var(--radius);
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: ''; position: absolute; top: -50%; right: -20%;
+            width: 300px; height: 300px; background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 700; position: relative; }
+        .header p { opacity: 0.9; font-size: 0.875rem; margin-top: 4px; position: relative; }
+        .offline-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.2); padding: 4px 12px;
+            border-radius: 20px; font-size: 0.75rem; margin-top: 12px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin: 12px 0;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+        .card-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+        .card-meta { font-size: 0.875rem; color: var(--text-secondary); }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; margin: -20px 16px 16px; position: relative; z-index: 2;
+        }
+        .stat-card {
+            background: var(--surface); border-radius: var(--radius-sm);
+            padding: 16px 8px; text-align: center; box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 14px 24px; border-radius: 12px;
+            border: none; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; width: 100%; text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:active { background: var(--primary-dark); transform: translateY(1px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+        .btn-sm { padding: 10px 16px; font-size: 0.875rem; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .topic-list { padding: 0 16px 100px; }
+        .topic-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--surface); padding: 16px; border-radius: var(--radius-sm);
+            margin-bottom: 10px; box-shadow: var(--shadow); border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .topic-item:active { transform: scale(0.98); background: var(--primary-light); }
+        .topic-info h3 { font-size: 0.95rem; font-weight: 600; }
+        .topic-info span { font-size: 0.8rem; color: var(--text-secondary); }
+        .topic-checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--border);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; margin-right: 12px;
+        }
+        .topic-checkbox.checked { background: var(--primary); border-color: var(--primary); color: white; }
+
+        .test-header {
+            background: var(--surface); padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .test-progress { flex: 1; margin: 0 16px; }
+        .progress-bar {
+            height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s; }
+        .timer { font-family: monospace; font-weight: 700; color: var(--primary); font-size: 1rem; }
+        .timer.warning { color: var(--danger); animation: pulse 1s infinite; }
+
+        .question-container { padding: 20px 16px 100px; }
+        .question-card {
+            background: var(--surface); border-radius: var(--radius-sm);
+            padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .question-number {
+            display: inline-block; background: var(--primary-light); color: var(--primary);
+            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .question-text { font-size: 1.05rem; line-height: 1.6; margin-bottom: 16px; word-wrap: break-word; }
+
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--bg); border: 2px solid var(--border);
+            padding: 14px 16px; border-radius: 12px; cursor: pointer;
+            transition: all 0.2s; text-align: left; width: 100%; font-size: 1rem; color: var(--text);
+        }
+        .option:active { transform: scale(0.99); }
+        .option.selected { border-color: var(--primary); background: var(--primary-light); }
+        .option.correct { border-color: var(--success); background: #d1fae5; }
+        .option.wrong { border-color: var(--danger); background: #fee2e2; }
+        .option.disabled { pointer-events: none; opacity: 0.7; }
+        .option-letter {
+            min-width: 32px; height: 32px; border-radius: 50%;
+            background: var(--surface); border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.875rem; flex-shrink: 0;
+        }
+        .option.selected .option-letter { background: var(--primary); color: white; border-color: var(--primary); }
+        .option.correct .option-letter { background: var(--success); color: white; border-color: var(--success); }
+        .option.wrong .option-letter { background: var(--danger); color: white; border-color: var(--danger); }
+        .option-text { flex: 1; word-break: break-word; }
+
+        .test-footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 12px 16px 24px; display: flex; gap: 10px;
+            max-width: 480px; margin: 0 auto;
+        }
+        .btn-flag { padding: 12px; min-width: 48px; }
+        .flagged { color: var(--warning) !important; }
+
+        .palette-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 200; display: none;
+            animation: fadeIn 0.2s;
+        }
+        .palette-overlay.active { display: block; }
+        .palette-sheet {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: var(--surface); border-radius: var(--radius) var(--radius) 0 0;
+            padding: 20px; max-height: 70vh; overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+        .palette-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px;
+        }
+        .palette-item {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; border: 2px solid var(--border); font-weight: 700;
+            cursor: pointer; font-size: 0.875rem; background: var(--bg);
+        }
+        .palette-item.answered { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+        .palette-item.flagged { border-color: var(--warning); color: var(--warning); }
+        .palette-item.current { box-shadow: 0 0 0 3px var(--primary); }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 var(--radius) var(--radius);
+        }
+        .score-circle {
+            width: 140px; height: 140px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); margin: 20px auto;
+            display: flex; align-items: center; justify-content: center;
+            border: 4px solid rgba(255,255,255,0.3); position: relative;
+        }
+        .score-value { font-size: 2.5rem; font-weight: 800; }
+        .score-label { font-size: 0.875rem; opacity: 0.9; margin-top: 8px; }
+        .pass-badge {
+            display: inline-block; padding: 6px 20px; border-radius: 20px;
+            font-weight: 700; font-size: 0.875rem; margin-top: 12px;
+        }
+        .pass { background: var(--success); }
+        .fail { background: var(--danger); }
+
+        .results-body { padding: 20px 16px 100px; }
+        .result-stat-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid var(--border);
+        }
+        .result-stat-row:last-child { border-bottom: none; }
+
+        .review-card {
+            background: var(--surface); border-radius: var(--radius-sm);
+            padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow);
+            border-left: 4px solid var(--border);
+        }
+        .review-card.correct { border-left-color: var(--success); }
+        .review-card.wrong { border-left-color: var(--danger); }
+        .review-card.skipped { border-left-color: var(--warning); }
+        .review-status {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.75rem; font-weight: 700; padding: 4px 10px;
+            border-radius: 20px; margin-bottom: 8px;
+        }
+        .review-status.correct { background: #d1fae5; color: #065f46; }
+        .review-status.wrong { background: #fee2e2; color: #991b1b; }
+        .review-status.skipped { background: #fef3c7; color: #92400e; }
+
+        .history-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--surface); padding: 16px; border-radius: var(--radius-sm);
+            margin-bottom: 10px; box-shadow: var(--shadow); border: 1px solid var(--border);
+        }
+        .history-score { font-weight: 700; font-size: 1.1rem; }
+        .history-date { font-size: 0.8rem; color: var(--text-secondary); }
+
+        .mt-2 { margin-top: 8px; }
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .p-4 { padding: 16px; }
+        .w-full { width: 100%; }
+
+        .mode-selector { display: flex; gap: 10px; margin: 16px 0; }
+        .mode-btn {
+            flex: 1; padding: 12px; border: 2px solid var(--border);
+            background: var(--surface); border-radius: 12px; cursor: pointer;
+            text-align: center; font-weight: 600; transition: all 0.2s;
+        }
+        .mode-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HOME SCREEN -->
+        <div id="screen-home" class="screen active">
+            <div class="header">
+                <h1>📚 Employability Skills</h1>
+                <p>2nd Year Skills Mock Test (2026)</p>
+                <div class="offline-badge">
+                    <span>📴</span> Offline Mode
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-topics">0</div>
+                    <div class="stat-label">Topics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-tests">0</div>
+                    <div class="stat-label">Tests Taken</div>
+                </div>
+            </div>
+            <div class="p-4">
+                <button class="btn btn-primary mb-4" onclick="app.goToTopics()">📝 Start New Test</button>
+                <button class="btn btn-outline mb-4" onclick="app.goToHistory()">📊 Test History</button>
+                <div class="card" style="margin-top:8px">
+                    <div class="card-title">💡 How to use</div>
+                    <div class="card-meta">
+                        Select topics and start a practice or exam mock test. Works 100% offline.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPICS SCREEN -->
+        <div id="screen-topics" class="screen">
+            <div class="test-header">
+                <button class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px" onclick="app.goHome()">← Back</button>
+                <div style="font-weight:700">Select Topics</div>
+                <button class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px" onclick="app.toggleSelectAll()" id="select-all-btn">All</button>
+            </div>
+            <div style="padding:16px">
+                <div class="mode-selector">
+                    <div class="mode-btn active" onclick="app.setMode('exam', this)">🎯 Exam Mode</div>
+                    <div class="mode-btn" onclick="app.setMode('practice', this)">📚 Practice</div>
+                </div>
+                <div style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:8px">
+                    <span id="selected-count">0</span> topics selected • <span id="selected-questions">0</span> questions
+                </div>
+            </div>
+            <div class="topic-list" id="topic-list"></div>
+            <div style="position:fixed;bottom:0;left:0;right:0;padding:16px;background:var(--surface);border-top:1px solid var(--border);max-width:480px;margin:0 auto">
+                <button class="btn btn-primary" id="start-test-btn" onclick="app.startTest()" disabled>Start Test</button>
+            </div>
+        </div>
+
+        <!-- TEST SCREEN -->
+        <div id="screen-test" class="screen">
+            <div class="test-header">
+                <button class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px" onclick="app.confirmEnd()">✕</button>
+                <div class="test-progress">
+                    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                    <div style="font-size:0.75rem;color:var(--text-secondary);text-align:center;margin-top:4px">
+                        <span id="q-current">1</span> / <span id="q-total">1</span>
+                    </div>
+                </div>
+                <div class="timer" id="timer">00:00</div>
+                <button class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px" onclick="app.togglePalette()">☰</button>
+            </div>
+            <div class="question-container" id="question-container"></div>
+            <div class="test-footer">
+                <button class="btn btn-outline btn-flag" id="flag-btn" onclick="app.toggleFlag()">🚩</button>
+                <button class="btn btn-outline" style="flex:1" id="prev-btn" onclick="app.prevQuestion()">← Prev</button>
+                <button class="btn btn-primary" style="flex:2" id="next-btn" onclick="app.nextQuestion()">Next →</button>
+            </div>
+        </div>
+
+        <!-- PALETTE OVERLAY -->
+        <div class="palette-overlay" id="palette-overlay" onclick="app.togglePalette()">
+            <div class="palette-sheet" onclick="event.stopPropagation()">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <h3 style="font-size:1.1rem">Question Palette</h3>
+                    <button class="btn btn-sm btn-outline" style="width:auto" onclick="app.togglePalette()">Close</button>
+                </div>
+                <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:8px">
+                    <span style="display:inline-block;width:12px;height:12px;background:var(--primary);border-radius:3px;margin-right:4px"></span> Answered
+                    <span style="display:inline-block;width:12px;height:12px;background:var(--warning);border-radius:3px;margin-left:12px;margin-right:4px"></span> Flagged
+                </div>
+                <div class="palette-grid" id="palette-grid"></div>
+                <button class="btn btn-danger w-full mt-4" onclick="app.confirmEnd()">End Test</button>
+            </div>
+        </div>
+
+        <!-- RESULTS SCREEN -->
+        <div id="screen-results" class="screen">
+            <div class="results-header">
+                <h2 style="font-size:1.25rem">Test Completed! 🎉</h2>
+                <div class="score-circle">
+                    <div class="score-value" id="result-score">0%</div>
+                </div>
+                <div class="score-label" id="result-message">Keep practicing!</div>
+                <div class="pass-badge" id="pass-badge">PASS</div>
+            </div>
+            <div class="results-body">
+                <div class="card">
+                    <div class="result-stat-row"><span>✅ Correct</span><strong id="result-correct" style="color:var(--success)">0</strong></div>
+                    <div class="result-stat-row"><span>❌ Wrong</span><strong id="result-wrong" style="color:var(--danger)">0</strong></div>
+                    <div class="result-stat-row"><span>⏭️ Skipped</span><strong id="result-skipped" style="color:var(--warning)">0</strong></div>
+                    <div class="result-stat-row"><span>⏱️ Time Taken</span><strong id="result-time">00:00</strong></div>
+                </div>
+                <button class="btn btn-primary mt-4" onclick="app.goToReview()">🔍 Review Answers</button>
+                <button class="btn btn-outline mt-2" onclick="app.goHome()">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <!-- REVIEW SCREEN -->
+        <div id="screen-review" class="screen">
+            <div class="test-header">
+                <button class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px" onclick="app.goToResults()">← Back</button>
+                <div style="font-weight:700">Review Answers</div>
+                <div style="width:40px"></div>
+            </div>
+            <div class="question-container" id="review-container"></div>
+        </div>
+
+        <!-- HISTORY SCREEN -->
+        <div id="screen-history" class="screen">
+            <div class="test-header">
+                <button class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px" onclick="app.goHome()">← Back</button>
+                <div style="font-weight:700">Test History</div>
+                <div style="width:40px"></div>
+            </div>
+            <div class="p-4" id="history-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p>No tests taken yet. Start your first mock test!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Employability Skills Question Dataset Organized by Topics
+        const QUIZ_DATA = {
+            "Basic Career Skills": [
+                {"question_id": 135206, "question": "Which of the following is the key component of a resume?", "options": ["Travel History", "Work Experience", "Favorite Books", "Personal Anecdotes"], "answer": "B", "notes": null},
+                {"question_id": 135207, "question": "For applying a job, your first preparation is ______.", "options": ["book a ticket to the interview place", "save money for expenses", "prepare a resume", "prepare for the interview"], "answer": "C", "notes": null},
+                {"question_id": 135208, "question": "What is the primary purpose of a cover letter?", "options": ["To list all your previous job responsibilities", "To introduce yourself and explain why you are a good fit for the job", "To provide a detailed personal biography", "To summarize your educational qualifications"], "answer": "B", "notes": null},
+                {"question_id": 135209, "question": "Which of the following is an important step to take before sending your resume?", "options": ["Use complex words", "Focus only on technical skills", "Ensure details like phone number and email are correct", "Skip proofreading"], "answer": "C", "notes": null},
+                {"question_id": 135210, "question": "The ability to connect well with people is known as _______.", "options": ["interpersonal skill", "leadership", "time management", "creativity"], "answer": "A", "notes": null},
+                {"question_id": 135211, "question": "The ability to wait and stay calm is known as ______.", "options": ["creativity", "problem solving", "patience", "interpersonal skill"], "answer": "C", "notes": null},
+                {"question_id": 135212, "question": "Punctuality means _______", "options": ["done by punching machine", "informal", "politeness", "being on time"], "answer": "D", "notes": null},
+                {"question_id": 135213, "question": "Complete the sentence with appropriate word. \nThe Plumber _______ the tap.", "options": ["fit", "are fitting", "is fitting", "were fitting"], "answer": "C", "notes": null},
+                {"question_id": 135214, "question": "When you borrow a pen from your classmate, what should you say?", "options": ["Give me your pen.", "Can you please give me a pen?", "I want a pen.", "I am taking your pen."], "answer": "B", "notes": null},
+                {"question_id": 135215, "question": "Magnificent, sharp, lengthy, bright, - are examples of ______", "options": ["describing words", "action words", "nouns", "pronouns"], "answer": "A", "notes": null},
+                {"question_id": 135216, "question": "Table, wire, socket, cable, hammer, nail - are ______", "options": ["describing words", "pronouns", "naming words", "action words"], "answer": "C", "notes": null},
+                {"question_id": 135217, "question": "Fix, measure, pull, lift, grind, mix, operate - are examples of ______", "options": ["pronouns", "action words", "describing words", "naming words"], "answer": "B", "notes": null},
+                {"question_id": 135218, "question": "Comma, full stop, question mark are examples of _______", "options": ["design", "next paragraph", "formal communication", "punctuation mark"], "answer": "D", "notes": null},
+                {"question_id": 135219, "question": "When you start a discussion on a topic, what do you say?", "options": ["Let you start", "Let me say", "Let us discuss", "Let us finish"], "answer": "C", "notes": null},
+                {"question_id": 135220, "question": "While addressing your boss, you should be ______", "options": ["Impolite", "Informal", "Formal", "Expressive"], "answer": "C", "notes": null},
+                {"question_id": 135221, "question": "You are requested to complete the given assignment by Monday This is an example of _______", "options": ["informal communication", "rude communication", "an order", "formal communication"], "answer": "D", "notes": null},
+                {"question_id": 135222, "question": "Gestures, facial expressions, eye contact are examples of _______", "options": ["verbal communication", "non-verbal communication", "oral communication", "written communication"], "answer": "B", "notes": null},
+                {"question_id": 135223, "question": "‘Hi,’ ‘How are you?’, ‘What’s up?’ are examples of _______.", "options": ["formal communication", "informal communication", "polite communication", "impolite communication"], "answer": "B", "notes": null},
+                {"question_id": 135224, "question": "Complete the sentence with a suitable descriptive word: The roads in my town are in ________ condition.", "options": ["good", "expensive", "comfortable", "spacious"], "answer": "A", "notes": null},
+                {"question_id": 135225, "question": "Complete the sentence with a suitable describing word: There is a _________ garden with lovely flowers.", "options": ["expensive", "dim", "lots of", "beautiful"], "answer": "D", "notes": null},
+                {"question_id": 135226, "question": "Complete the sentence with a suitable describing word: There is a ________ playground near our house.", "options": ["older", "big", "dim", "shiny"], "answer": "B", "notes": null},
+                {"question_id": 135227, "question": "Complete the sentence with a suitable describing word: There are ________ apartments in my neighborhood.", "options": ["dim", "noise", "dull", "spacious"], "answer": "D", "notes": null},
+                {"question_id": 135228, "question": "Fill up the blanks with suitable words so as to become a meaningful sentence.\nThe Principal called Manoj and asked ______ to show ______ hall ticket for the CTS Examination.", "options": ["him, his", "him, her", "her, his", "her, him"], "answer": "A", "notes": null},
+                {"question_id": 135229, "question": "Fill up the blanks with suitable words so as to become a meaningful sentence\n\"Tell us about a difficult situation you have _______ and how you _______ to come out of it.\"", "options": ["face, manage", "managed, face", "faced, manage", "faced, managed"], "answer": "D", "notes": null},
+                {"question_id": 135230, "question": "Complete the sentence with a suitable describing word.\nThere is a factory in the area. The air is ________.", "options": ["polluted", "boring", "uneven", "noisy"], "answer": "A", "notes": null},
+                {"question_id": 135231, "question": "Complete the sentence with a suitable describing word:\nThere is water scarcity in the locality. The area is ________.", "options": ["uneven", "noisy", "dry", "boring"], "answer": "C", "notes": null},
+                {"question_id": 135232, "question": "Complete the sentence with a suitable describing word:\nThe transportation to some rural areas is difficult as the roads are _________.", "options": ["dry", "polluted", "boring", "uneven"], "answer": "D", "notes": null},
+                {"question_id": 135233, "question": "Which one will help us to maintain the balance between mental and physical activities?", "options": ["Hobbies", "Laziness", "Stress", "Inactivity"], "answer": "A", "notes": null},
+                {"question_id": 135234, "question": "Important factors to check in a good resume are __________.", "options": ["paper quality", "company details", "Correct information, free from spelling and grammar mistakes", "attractive words"], "answer": "C", "notes": null},
+                {"question_id": 135235, "question": "Which of the following is a key factor for a well-organized resume?", "options": ["Complex designs", "Fancy fonts", "Simple designs and easy-to-read words", "Long paragraphs"], "answer": "C", "notes": null},
+                {"question_id": 135236, "question": "Spoken communication is usually not only _______ but also _______", "options": ["formal, informal", "verbal, nonverbal", "verbal, informal", "formal, nonverbal"], "answer": "B", "notes": null},
+                {"question_id": 135237, "question": "What is a key component of a resume that outlines your relevant career experience and is used by experienced professionals?", "options": ["Resume Profile", "Resume Objective", "Work Experience", "Transferable Skills"], "answer": "C", "notes": null},
+                {"question_id": 135238, "question": "Which of the following is NOT a key component of a resume?", "options": ["Relevant skills", "Additional information", "References", "Personal anecdotes"], "answer": "D", "notes": null},
+                {"question_id": 135239, "question": "Fill up the blanks with suitable words so as to become a meaningful sentence.\nThere _______ a coffee shop _______ the park.", "options": ["are, next to", "is, next to", "is, next", "are, next"], "answer": "B", "notes": null},
+                {"question_id": 135240, "question": "Fill up the blank with a suitable word so as to become a meaningful sentence.\nRainwater harvesting _______ to prevent water scarcity.", "options": ["gives", "gave", "help", "helps"], "answer": "D", "notes": null},
+                {"question_id": 135241, "question": "Fill up the blanks with suitable words so as to become a meaningful sentence.\nThere are many dos and don’ts to be ______ while preparing for/attending an __________", "options": ["there, interview", "identify, interview", "identified, interviewed", "identified, interview"], "answer": "D", "notes": null},
+                {"question_id": 135242, "question": "Miscommunication can lead to ________", "options": ["building relationships", "misunderstandings", "successful planning", "effective results"], "answer": "B", "notes": null},
+                {"question_id": 135243, "question": "What is required for effective communication?", "options": ["Keep Listening", "Keep Talking", "Listen and talk carefully", "Listen carefully"], "answer": "C", "notes": null},
+                {"question_id": 135244, "question": "Which of the following is included in the header section of a resume?", "options": ["Resume summary or objective", "Name, contact number, professional email ID, and address", "Career goals and achievements", "Relevant career experience"], "answer": "B", "notes": null},
+                {"question_id": 135245, "question": "Why is it important to understand the key components of a resume?", "options": ["To list your hobbies and interests", "To create a colorful design", "To showcase your unique skills, accomplishments, and potential", "To include personal anecdotes"], "answer": "C", "notes": null},
+                {"question_id": 135246, "question": "What is the process of formally introducing oneself called?", "options": ["Self-introduction", "Hiring", "Decision", "Seeking"], "answer": "A", "notes": null},
+                {"question_id": 135247, "question": "The word 'resume' comes from French and means ________", "options": ["summary", "education", "experience", "placement"], "answer": "A", "notes": null},
+                {"question_id": 135248, "question": "Which of the following are included in a resume?", "options": ["Hobbies, favorite foods, and personal interests", "Childhood memories, dreams, and aspirations", "Daily routine, favorite movies, and vacation plans", "Contact information, educational details, skills and work experience"], "answer": "D", "notes": null},
+                {"question_id": 135249, "question": "While applying for a job, the covering letter should be easy to read by means of ______", "options": ["long descriptions.", "dividing the text into shorter paragraphs.", "increasing the font size.", "extra curricular activities."], "answer": "B", "notes": null},
+                {"question_id": 135250, "question": "After preparing the resume, the next important step to do is _____", "options": ["sending the resume to the employer.", "writing an impressive cover letter.", "preparing for interview.", "applying for the job."], "answer": "B", "notes": null},
+                {"question_id": 135251, "question": "What is very important to keep in mind while reviewing a resume?", "options": ["Salary details", "Lot of information to get the job", "Interest and hobbies", "Highlight skills and qualifications that match the job"], "answer": "D", "notes": null},
+                {"question_id": 135252, "question": "While applying for a job, the important information that should be mentioned in the covering letter includes ______.", "options": ["salary expectations", "education details", "reasons of suitable for the role", "hobbies"], "answer": "C", "notes": null},
+                {"question_id": 135253, "question": "What is formal communication?", "options": ["All written communication", "Official communication following a set of rules", "Talking with friends and family", "Casual chatting on social media"], "answer": "B", "notes": null},
+                {"question_id": 135254, "question": "Which of the following is a formal introduction in a job interview?", "options": ["\"Hey, nice to meet you!\"", "\"Hi, whats your name?\"", "\"hello.. You can start the interview!\"", "\"Good morning. Thank you for the opportunity.\""], "answer": "D", "notes": null},
+                {"question_id": 135255, "question": "What is an example of formal written communication?", "options": ["Texting a friend", "Sending a WhatsApp message", "Writing an email to your manager", "Posting on social media platforms"], "answer": "C", "notes": null},
+                {"question_id": 135256, "question": "During a job interview, if you couldn't hear or understand a question, what would you say?", "options": ["\"Sorry! I didn’t understand. Could you please repeat the question?\"", "\"Hey, can you repeat that? I wasn’t paying attention.\"", "\"I am lost. Can you say it again?\"", "\"Speak clearly and repeat the question.\""], "answer": "A", "notes": null},
+                {"question_id": 135257, "question": "During a job interview, which of the following responses shows good formal communication?", "options": ["\"I'm pretty good at a lot of things.\"", "\"Uh, I guess I can do a little bit of everything.\"", "\"My top three skills are problem-solving, teamwork, and attention to detail.\"", "\"I don't know, I never really thought about it.\""], "answer": "C", "notes": null},
+                {"question_id": 135258, "question": "What is \"informal communication\"?", "options": ["All verbal communication", "Official communication following a set of rules", "Casual conversations outside of official work arrangements", "Talking at official meetings"], "answer": "C", "notes": null},
+                {"question_id": 135259, "question": "Which of the following is an informal situation within the workplace?", "options": ["Working with files", "Working on a desktop", "Working on a laptop", "Having a meal in the office canteen"], "answer": "D", "notes": null},
+                {"question_id": 135260, "question": "What are some advantages of informal communication at the workplace?", "options": ["Helps people work together better", "Makes things more official at work", "Creates a strict environment at work", "Makes people talk less"], "answer": "A", "notes": null},
+                {"question_id": 135261, "question": "One of the informations in an informal conversation with a co-worker is _________", "options": ["asking about their roles in the company.", "asking about their house.", "asking about their experience.", "asking about the office timing."], "answer": "B", "notes": null},
+                {"question_id": 135262, "question": "If a co-worker asks for a support with a task, proper way of responding is _________", "options": ["ask, you don't even know this much?", "i am too busy right now.", "sure, I can help. What do you need?", "send a formal request via email."], "answer": "C", "notes": null},
+                {"question_id": 135263, "question": "What is workplace etiquette?", "options": ["Everyday manners outside of work", "Proper behaviour and workplace professionalism", "Casual behaviour with colleagues", "Gossiping"], "answer": "B", "notes": null},
+                {"question_id": 135264, "question": "Which of the following is considered as appropriate workplace behaviour?", "options": ["Being late to work regularly", "Interrupting others during meetings", "Talking loudly on the phone", "Maintaining a clean workspace"], "answer": "D", "notes": null},
+                {"question_id": 135265, "question": "Which of the following skills would be most beneficial to add to your resume?", "options": ["Leadership Qualities", "Laziness", "Procrastination", "Indifference"], "answer": "A", "notes": null},
+                {"question_id": 135266, "question": "Which of the following actions in an official meeting shows appropriate workplace etiquette?", "options": ["Checking phone and respond to messages", "Chatting with coworkers", "Interrupt the speaker in meeting", "Keeping the phone on silent mode and actively participate in the discussion"], "answer": "D", "notes": null},
+                {"question_id": 135267, "question": "If coworkers are gossiping about another coworker, what you should do?", "options": ["Feel that gossiping is inappropriate workplace behaviour", "Join the conversation and continue", "Tell another coworker about the gossip", "Listen to the gossip"], "answer": "A", "notes": null},
+                {"question_id": 135268, "question": "Which of the following statements shows good teamwork?", "options": ["Keeping all ideas to yourself", "Criticizing teammates' efforts", "Working together towards a common goal", "Ignoring others' ideas and opinions"], "answer": "C", "notes": null},
+                {"question_id": 135269, "question": "Which of the following is required for teamwork?", "options": ["Proper communication", "Money", "Conflict and Argument", "Easy tasks"], "answer": "A", "notes": null},
+                {"question_id": 135270, "question": "While working on a project with other teammates, which of these make as a good team player?", "options": ["Getting angry when others don't listen", "Sharing ideas to help the team work faster", "Thinking we never make a mistake", "Not listening to teammates ideas and opinions"], "answer": "B", "notes": null},
+                {"question_id": 135271, "question": "Your team has completed a challenging project successfully. How should you celebrate the success?", "options": ["Say you did everything and don't praise others", "Blame the group for any errors", "Don't celebrate and start the next job", "Thank everyone in your group for helping"], "answer": "D", "notes": null},
+                {"question_id": 135272, "question": "If a teammate is struggling to complete their assigned task, what should you do?", "options": ["Ignore their struggle and focus on your own tasks", "Offer to help and support them to complete their task", "Criticize them for not being efficient", "Complain to the superior about their lack of contribution"], "answer": "B", "notes": null}
+            ],
+            "Future Work Skills": [
+                {"question_id": 135273, "question": "_______ is influenced by rapid change in technology", "options": ["Future of work", "Nature of work", "Workforce", "Working capital"], "answer": "A", "notes": null},
+                {"question_id": 135274, "question": "Which of the following ways you should use to improve your technology skills?", "options": ["Handwork", "Playing", "Social service", "Social media, Online digital tools"], "answer": "D", "notes": null},
+                {"question_id": 135275, "question": "\"Gig\" economy is ______", "options": ["A system of work where people work in part-time", "Indian economy", "Foreign economy", "Regular job"], "answer": "A", "notes": null},
+                {"question_id": 135276, "question": "__________ are a great way for gig workers to find jobs.", "options": ["Employment exchange", "Online platforms and Apps", "Employment news paper", "Placement cell"], "answer": "B", "notes": null},
+                {"question_id": 135277, "question": "Which among the following is self-employment idea?", "options": ["Freelance tailoring Service", "Boutique owner", "Home catering service", "All the options"], "answer": "D", "notes": null},
+                {"question_id": 135278, "question": "Migration of work means _______", "options": ["shifting the industry", "going to a different place to find a job", "shifting of profession", "working in different shifts"], "answer": "B", "notes": null},
+                {"question_id": 135279, "question": "Important factor to consider before migrating include _______.", "options": ["easy job", "tourist place", "cost of living", "freedom"], "answer": "C", "notes": null},
+                {"question_id": 135280, "question": "Skill India Digital is _________", "options": ["a digital Movie", "a platform for learning and career resource", "central govt. office", "name of a trade"], "answer": "B", "notes": null},
+                {"question_id": 135281, "question": "Create a digital CV and share it with a QR code is _________", "options": ["your digital identity", "digital marketing", "entrepreneurship", "interview skill"], "answer": "A", "notes": null},
+                {"question_id": 135282, "question": "Separating paper and plastic from bio waste before throwing them away is ________", "options": ["creativity", "green mindset", "innovation", "profession"], "answer": "B", "notes": null},
+                {"question_id": 135283, "question": "Good practice for green mind set is _________.", "options": ["taking a lot of printouts", "using air conditioners all the time", "keeping lights on all the time", "separating and recycling waste"], "answer": "D", "notes": null},
+                {"question_id": 135284, "question": "________ is a time when you, your family, and your teacher meet and interact to understand and support each other better.", "options": ["Family engagement", "Family tour", "Family meeting", "Family income"], "answer": "A", "notes": null},
+                {"question_id": 135285, "question": "Which of the following future workplace skills is likely to have less importance?", "options": ["Working from home", "Working with digital tools", "Working hours strictly between 9 AM to 5 PM", "Adapting to new technology"], "answer": "C", "notes": null},
+                {"question_id": 135286, "question": "What does a workplace look like after a pandemic like covid?", "options": ["Mix of work from home and office", "Empty space", "Less employees", "Less production"], "answer": "A", "notes": null},
+                {"question_id": 135287, "question": "Which of the following is an app-based gig economy platform that helps people find part-time jobs?", "options": ["Permanent employee", "Independent contractor", "Home catering", "Swiggy"], "answer": "D", "notes": null},
+                {"question_id": 135288, "question": "Which of the following is a regular, non-app-based gig economy job opportunity?", "options": ["Uber", "Dunzo", "Home catering", "Swiggy"], "answer": "C", "notes": null},
+                {"question_id": 135289, "question": "How have workplaces changed after COVID?", "options": ["No focus on technology", "Flexible in working hours is nil", "Mix of in-person and at-home work", "Less job opportunities"], "answer": "C", "notes": null},
+                {"question_id": 135290, "question": "Which is an example of being open to learning in the workplace?", "options": ["Refusing to attend training sessions to improve technology skills", "Accepting and adapting to changes in work processes", "Avoiding feedback from colleagues", "Ignoring advancements in technology"], "answer": "B", "notes": null},
+                {"question_id": 135291, "question": "An important skill required for the future of work is _______.", "options": ["Learning to make reels and TikTok videos.", "Avoiding learning new skills.", "Mastering internet skills.", "Avoiding building professional relationships."], "answer": "C", "notes": null},
+                {"question_id": 135292, "question": "What is an important future workplace skill for employees?", "options": ["Doing paperwork", "Doing manual work", "Networking and relationship-building", "Planning holidays"], "answer": "C", "notes": null},
+                {"question_id": 135293, "question": "When a person joined a new company, he may be nervous using digital tablets provided at work. That time he shall ________", "options": ["Complain to his manager.", "Ask his coworkers to do all the digital work.", "Quit his job.", "Keep an open mind and ask his coworkers to teach him."], "answer": "D", "notes": null},
+                {"question_id": 135294, "question": "Which of the following best describes the gig economy?", "options": ["A system where employees work full-time for a single employer", "A system where workers take on part-time or temporary jobs", "A system where workers are paid a fixed monthly salary", "A system where workers have fixed work hours and locations"], "answer": "B", "notes": null},
+                {"question_id": 135295, "question": "Which option below describes a \"gig\" in the gig economy?", "options": ["A job with full-time hours and benefits", "A typical 9-5 job", "A specific task or project", "No specific task"], "answer": "C", "notes": null},
+                {"question_id": 135296, "question": "A _______ helps gig workers find customers and provide services at a fixed charge.", "options": ["netflix", "platform/app", "school", "bank"], "answer": "B", "notes": null},
+                {"question_id": 135297, "question": "To become a gig worker, a person should find gig work opportunities by means of _______", "options": ["Finding a multinational company.", "Connecting with friends, people you might know, and groups in your community.", "Independently searching for a job.", "Studying about gig work."], "answer": "B", "notes": null},
+                {"question_id": 135298, "question": "A skilled electrician searching gig work that matches his skill will find job opportunities in _______", "options": ["Amazon for selling products online", "Zoom for video calls", "Uber for driving people", "Urban Company for offering home repair services"], "answer": "D", "notes": null},
+                {"question_id": 135299, "question": "What does self-employment mean?", "options": ["Working for a single employer", "Working independently and earning directly from your work", "Receiving a fixed monthly salary", "Working part-time from home"], "answer": "B", "notes": null},
+                {"question_id": 135300, "question": "What is the benefit of self-employment?", "options": ["Directly earning from your work", "Fixed working hours", "Monthly salary payment", "Limited control over your tasks"], "answer": "A", "notes": null},
+                {"question_id": 135301, "question": "Which is an example of a self-employment?", "options": ["Working full-time at a company", "Driving for a taxi company", "Being a student at a university", "Teaching subjects or skills as a personal tutor"], "answer": "D", "notes": null},
+                {"question_id": 135302, "question": "How can you become self-employed?", "options": ["Join an MBA course", "Try your idea on a small scale and join relevant short term course", "Work in a company", "Rely solely on luck"], "answer": "B", "notes": null},
+                {"question_id": 135303, "question": "Someone loves photography and dreams of starting his own photography business. They should start with _______.", "options": ["buying the latest photography equipment, even if it is beyond their budget.", "taking random pictures and sharing them online.", "learning more about photography and joining a basic photography course.", "starting advertising without any planning."], "answer": "C", "notes": null},
+                {"question_id": 135304, "question": "What does migrating for work mean?", "options": ["Staying in the same place for work", "Changing jobs within the same city", "Moving to a different place to find a job", "Working from home"], "answer": "C", "notes": null},
+                {"question_id": 135305, "question": "What is a common reason for people to migrate for work?", "options": ["To learn new languages", "To find better job opportunities", "To spend time with family", "To explore new places"], "answer": "B", "notes": null},
+                {"question_id": 135306, "question": "What would be the first step if some one plans to move to a different city for work?", "options": ["Move to new place and search for job.", "Apply for loan in bank.", "Ask money from relatives and friends.", "Find how much it will cost to travel and live there; earn and save."], "answer": "D", "notes": null},
+                {"question_id": 135307, "question": "If you want to work in a foreign country, to migrate safely, you have to _______", "options": ["Learn about the place, confirm the job before moving.", "Move and ask for confirmation.", "Leave to foreign country without informing anyone.", "Think how you spend your money."], "answer": "A", "notes": null},
+                {"question_id": 135308, "question": "If you have to migrate from your place to a new city to join a new job, what will you do to migrate safely?", "options": ["Research about living in the new city", "Always share exact location on social media", "Buy gifts for neighbours", "Believe everything brokers say"], "answer": "A", "notes": null},
+                {"question_id": 135309, "question": "What is the main purpose of the Skill India Digital Platform?", "options": ["To offer offline training programs", "To provide financial assistance for job seekers", "To facilitate online learning and skill development", "To promote international job opportunities"], "answer": "C", "notes": null},
+                {"question_id": 135310, "question": "How can users access the Skill India Digital Platform?", "options": ["Only through offline training centers", "Only on a specific type of device", "Through a specialized learning app", "On computers, tablets, and phones"], "answer": "D", "notes": null},
+                {"question_id": 135311, "question": "Which section of the Skill India Digital Platform helps users find physical training centers nearby?", "options": ["Skill courses", "Job Exchange", "Centres", "Recommendations"], "answer": "C", "notes": null},
+                {"question_id": 135312, "question": "What type of resources one can find in the Skill India Digital Platform?", "options": ["Only job listings", "Courses, skill centers, job opportunities, and more", "Only eBooks and reading materials", "Financial services and government schemes"], "answer": "B", "notes": null},
+                {"question_id": 135313, "question": "To learn digital marketing in the Skill India Digital Platform, we have to ________", "options": ["search for job opportunities.", "enroll in any course available.", "explore the skill courses section.", "find a physical training center."], "answer": "C", "notes": null},
+                {"question_id": 135314, "question": "A green practice involves any activity that ________", "options": ["causes harm to the environment.", "protects and takes care of the environment and resources.", "involves consuming too much.", "generates pollution."], "answer": "B", "notes": null},
+                {"question_id": 135315, "question": "Which term describes using things in a way that can last for a long time without causing harm?", "options": ["Sustainability", "Pollution", "Eco-friendliness", "Resources"], "answer": "A", "notes": null},
+                {"question_id": 135316, "question": "What does having a green mindset mean?", "options": ["Making choices that harm the environment", "Using resources without considering sustainability", "Ignoring pollution and waste management", "Caring for the environment and using resources wisely"], "answer": "D", "notes": null},
+                {"question_id": 135317, "question": "Green practice means _______", "options": ["buying unnecessary items.", "leaving lights and fans on when leaving a room.", "carrying a cloth bag to buy groceries.", "buying single-use plastic water bottles."], "answer": "C", "notes": null},
+                {"question_id": 135318, "question": "While going for a picnic with friends, you have been asked to bring disposable plates and cups. With green mind set, your action will be ________", "options": ["say yes and bring disposable plates and cups.", "bring reusable plates and cups.", "ignore the invite to the picnic.", "bring green color disposable plates and cups."], "answer": "B", "notes": null},
+                {"question_id": 135319, "question": "What are green jobs?", "options": ["Jobs shared in green colours", "Jobs that harm the environment", "Jobs that ignore waste separation and recycling", "Jobs that conserve resources and help the environment"], "answer": "D", "notes": null},
+                {"question_id": 135320, "question": "Which of the following is a green practice?", "options": ["Using high power air conditioners", "Using plastic containers", "Not separating recycle waste", "Grow plants wherever possible"], "answer": "D", "notes": null},
+                {"question_id": 135321, "question": "A green workplace _______", "options": ["Uses less paper and energy-saving lights.", "Uses disposable items and plastic water bottles.", "Keeps the lights on all the time.", "Ignores waste separation and recycling."], "answer": "A", "notes": null},
+                {"question_id": 135322, "question": "Suggestion for green practices in the office canteen is ______", "options": ["Delivering food in plastic packaging.", "Using steel plates and cups.", "Providing lunch to the staff in disposable plates.", "Serve green vegetables."], "answer": "B", "notes": null},
+                {"question_id": 135323, "question": "A beauty parlor staff follows environment-friendly actions by means of _______.", "options": ["using plastic gloves.", "using plastic cups.", "discarding consumable items.", "using non plastic materials, disposing wastes in an environmentally friendly way."], "answer": "D", "notes": null}
+            ],
+            "Internet Skills": [
+                {"question_id": 135324, "question": "A computer system consists of __________", "options": ["software and program", "hardware and software", "mouse and keyboard", "circuit diagram"], "answer": "B", "notes": null},
+                {"question_id": 135325, "question": "A software application used to enable computer users to locate and access web page is called ___________", "options": ["web browser", "web server", "website", "email"], "answer": "A", "notes": null},
+                {"question_id": 135326, "question": "An illegal activity committed on the internet is called ___________", "options": ["virus", "cyber crime", "search engine", "social networking"], "answer": "B", "notes": null},
+                {"question_id": 135327, "question": "In an email, where will you add the recipient's email address to whom you want to send the copy of an email?", "options": ["To", "CC", "Bcc", "Subject"], "answer": "B", "notes": null},
+                {"question_id": 135328, "question": "Which one is a cyber crime?", "options": ["Sending email", "Online purchasing", "Online gambling", "Chatting with friends"], "answer": "C", "notes": null},
+                {"question_id": 135329, "question": "Which one is a search engine?", "options": ["Flicker", "Hotmail", "Facebook", "Google"], "answer": "D", "notes": null},
+                {"question_id": 135330, "question": "Which one is a social networking site?", "options": ["Outlook express", "Facebook", "Lotus notes", "Mozilla"], "answer": "B", "notes": null},
+                {"question_id": 135331, "question": "Which one is a web browser?", "options": ["Facebook", "Hotmail", "Internet explorer", "Outlook express"], "answer": "C", "notes": null},
+                {"question_id": 135332, "question": "Which among the following is not an Online payment application?", "options": ["Google Pay", "BHIM UPI", "Banking Applications", "Instagram"], "answer": "D", "notes": null},
+                {"question_id": 135333, "question": "A wireless technology that connects a laptop to the internet is called _______.", "options": ["Bluetooth", "Wi-Fi", "Source Network", "Desktop"], "answer": "B", "notes": null},
+                {"question_id": 135334, "question": "Shortcut keys Ctrl+C, Ctrl+V, Ctrl+S mean _______", "options": ["save, cut, copy", "cut, save, copy", "copy, paste, save", "cut, copy, save"], "answer": "C", "notes": null},
+                {"question_id": 135335, "question": "The conversion of computer data from one format to another is called ______", "options": ["pasting", "copying", "cutting", "Data conversion"], "answer": "D", "notes": null},
+                {"question_id": 135336, "question": "What is called a media presentation shared over the Internet?", "options": ["Live media", "Live telecast", "Webcast", "Seminar"], "answer": "C", "notes": null},
+                {"question_id": 135337, "question": "What is the standard way in which computers connect wirelessly?", "options": ["Wi-Fi", "WAN", "LAN", "ISP"], "answer": "A", "notes": null},
+                {"question_id": 135338, "question": "Which wireless technology standard is used for exchanging data between fixed and mobile devices over short distance?", "options": ["Router", "Bluetooth", "Pen drive", "CD/DVD"], "answer": "B", "notes": null},
+                {"question_id": 135339, "question": "Which app is widely used for screen casting from your mobile phone?", "options": ["WhatsApp", "Facebook", "Webcast", "Mobizen"], "answer": "D", "notes": null},
+                {"question_id": 135340, "question": "______________ is a file storage and synchronization service of cloud computing developed by Google.", "options": ["Internet Explorer", "Google Drive", "Netflix", "Hard disc"], "answer": "B", "notes": null},
+                {"question_id": 135341, "question": "A secure Wi-Fi is one ______.", "options": ["that allows everyone to connect", "that is open to the public", "that has a password to login", "that is opened by landline"], "answer": "C", "notes": null},
+                {"question_id": 135342, "question": "Alexa, Google, Siri are in the category of _______", "options": ["Musical instruments", "Voice recognition devices", "Voice recorders", "Translation devices"], "answer": "B", "notes": null},
+                {"question_id": 135343, "question": "Full form of GPS is _______", "options": ["Globe Pointing System", "Great Polar System", "Global Positioning System", "Global Planning System"], "answer": "C", "notes": null},
+                {"question_id": 135344, "question": "We use Google maps to follow the _______ to reach a place.", "options": ["destination", "distance", "demark", "direction"], "answer": "D", "notes": null},
+                {"question_id": 135345, "question": "When we want to type using our voice, we are using _______", "options": ["voice of google", "voice recognition feature", "voicing technique", "voice recorder"], "answer": "B", "notes": null},
+                {"question_id": 135346, "question": "The ability of a computer or machine to mimic the capabilities of the human mind is called ________", "options": ["artificial intelligence", "intellect", "artificial performer", "natural intelligence"], "answer": "A", "notes": null},
+                {"question_id": 135347, "question": "A resume should be _______", "options": ["having long and detailed information", "short and precise", "bold and colourful", "having acronyms and abbreviation"], "answer": "B", "notes": null},
+                {"question_id": 135348, "question": "What should be entered in the 'To' field when drafting an email?", "options": ["The subject of the email", "The recipient's email address", "Your own email address", "The main message content"], "answer": "B", "notes": null},
+                {"question_id": 135349, "question": "The physical part of a computer is called ________", "options": ["software", "hardware", "malware", "spyware"], "answer": "B", "notes": null},
+                {"question_id": 135350, "question": "_________ is an activity where students who finished their studies from institute and come to talk to the present students.", "options": ["Alumni Engagement", "Job mela", "Campus interview", "Conference"], "answer": "A", "notes": null},
+                {"question_id": 135351, "question": "The practice of using a network of remote servers hosted on the internet to store, manage and process data is called _______", "options": ["Cloud computing", "Search engine", "Google", "Yahoo"], "answer": "A", "notes": null},
+                {"question_id": 135352, "question": "Which one is the input device among the options?", "options": ["Monitor", "Printer", "Speaker", "Keyboard"], "answer": "D", "notes": null},
+                {"question_id": 135353, "question": "Which one is essentially required to receive communication by Email?", "options": ["Desktop", "Printer", "Email account", "Laptop"], "answer": "C", "notes": null},
+                {"question_id": 135354, "question": "When searching for new information on Google, why is it important to use the right words?", "options": ["To find correct and useful information", "To change the color of the search page", "To make the screen brighter", "To learn a new language"], "answer": "A", "notes": null},
+                {"question_id": 135355, "question": "After collecting useful information for a project work, what will be the next step to do?", "options": ["Mix up all the information", "Share all the information with coworkers", "Read thoroughly the information and mark the important points", "Keep the information in separate folders"], "answer": "C", "notes": null},
+                {"question_id": 135356, "question": "For a project work you have collected some information from internet and sorted it. What is the best way to share it with your team?", "options": ["Tell everything in detail", "Share only the main points clearly, use simple words and pictures, if possible", "Talk about information which are not available", "Print all the information and give it to the team members."], "answer": "B", "notes": null},
+                {"question_id": 135357, "question": "Why is it good to think about what you learn?", "options": ["It's a good time pass", "It helps to remember and understand better.", "It improves handwriting.", "It makes you look busy."], "answer": "B", "notes": null},
+                {"question_id": 135358, "question": "While thinking about learning, what are the questions you can ask yourself?", "options": ["Its waste of time", "It is very tough", "How can I learn and understand better?", "It is very difficult for me to understand"], "answer": "C", "notes": null},
+                {"question_id": 135359, "question": "What is a job portal?", "options": ["A building where you go to find work", "A place where you can play games and talk to friends", "A special room where job interviews happen online", "A website where companies post jobs and people can search and apply for them"], "answer": "D", "notes": null},
+                {"question_id": 135360, "question": "What should you always remember when creating your profile on a job portal?", "options": ["To include skills required for the job, even if you don't have them", "To use a fake name", "To always be truthful", "To leave out important information"], "answer": "C", "notes": null},
+                {"question_id": 135361, "question": "Checking the skills required is important before applying for a job, because ________", "options": ["To be sure you can do the job well.", "To chat with friends about it.", "To impress the interviewer.", "It is not important to check the skills required for a job."], "answer": "A", "notes": null},
+                {"question_id": 135362, "question": "You are a trained electrician. If you want to get a job in Delhi, what are the key words you use to search in job portal?", "options": ["Electrician job", "Delhi job", "Electrician jobs in Delhi", "Electrician training"], "answer": "C", "notes": null},
+                {"question_id": 135363, "question": "If you want to apply for jobs through Naukri.com, what you will do?", "options": ["Select all the cities where jobs are available", "Match the skills with the job description", "Apply to all the jobs listed", "Ignore the job descriptions"], "answer": "B", "notes": null},
+                {"question_id": 135364, "question": "While applying for a job through email, what are the documents need to be attached?", "options": ["Birth certificate", "Resume, Course and Training Certificates", "Address Proof", "Photographs from childhood"], "answer": "B", "notes": null},
+                {"question_id": 135365, "question": "While writing an email, why it is important to state the subject clearly?", "options": ["Email cannot be sent without a subject line", "To tell the company what the email is about", "To show he has good English skills", "Subject should not be left blank"], "answer": "B", "notes": null},
+                {"question_id": 135366, "question": "While applying for a job, how to start an email to a company?", "options": ["Start with a joke", "Attach favorite photos", "Begin with a clear subject line and a polite greeting", "Write a short story about hobbies"], "answer": "C", "notes": null},
+                {"question_id": 135367, "question": "While sending a job application through email, how to share the resume and other documents?", "options": ["Click photos from phone and send it", "Should not send documents over email as it is not safe", "Copying and pasting the content of the documents into the email body", "Attach the scanned documents as pdf with the email"], "answer": "D", "notes": null},
+                {"question_id": 135368, "question": "While applying for a position as fitter, which of the following email subject lines would be the most suitable?", "options": ["Fitter Job needed", "Applying for a new Job", "Urgent Attention Needed", "Application for Fitter Position - [Your Name]"], "answer": "D", "notes": null},
+                {"question_id": 135369, "question": "How can linkedIn help you in finding a job?", "options": ["Its economical", "Connecting you with company, professionals faster", "Its available in mobile", "As informed by others"], "answer": "B", "notes": null},
+                {"question_id": 135370, "question": "The reason to reply to comments on your YouTube videos is _______", "options": ["to get more videos", "make viewers feel connected", "to use the internet", "to get more friends"], "answer": "B", "notes": null},
+                {"question_id": 135371, "question": "You are a talented carpenter. In what way it will help your work on YouTube video?", "options": ["It allows people to see your carpentry skills and appreciate your expertise", "Just a time pass", "Many related videos are available", "Its a hobby"], "answer": "A", "notes": null},
+                {"question_id": 135372, "question": "You have bakery business. Using WhatsApp, what way it will help your Business?", "options": ["Chat with friends", "Quickly respond to customer orders and questions", "Watch baking tutorial videos", "Check status updates"], "answer": "B", "notes": null},
+                {"question_id": 135373, "question": "You have an Instagram page for jewellery business. What should you do to connect with viewers?", "options": ["Post dance reels", "Post about a T.V. show you like", "Share daily updates about your business as Stories on social media", "Post cooking videos"], "answer": "C", "notes": null}
+            ],
+            "Professional Skills": [
+                {"question_id": 135374, "question": "What is a benefit of self-improvement?", "options": ["Better relationships", "Increased workload", "Lower confidence", "Stagnation"], "answer": "A", "notes": null},
+                {"question_id": 135375, "question": "For career growth and _________ we need to build ______", "options": ["skills, sustainability", "skills, bridges", "sustainability, dams", "sustainability, new skills"], "answer": "D", "notes": null},
+                {"question_id": 135376, "question": "What will keep evolving there by making jobs undergo changes?", "options": ["Time", "Workforce", "Technology", "Investment"], "answer": "C", "notes": null},
+                {"question_id": 135377, "question": "What is required for your career growth and sustainability?", "options": ["Good behaviour", "Degree", "Opportunity", "Build new skills"], "answer": "D", "notes": null},
+                {"question_id": 135378, "question": "What has drastically changed the world of work?", "options": ["Environment", "Technology", "Investment", "Workers"], "answer": "B", "notes": null},
+                {"question_id": 135379, "question": "A person can get promotions based on his _______ and _________", "options": ["environment, experience", "example, qualifications", "qualifications, experience", "conduct, behaviour"], "answer": "C", "notes": null},
+                {"question_id": 135380, "question": "What is work ethic?", "options": ["Skills for work", "Moral values at work", "Physical labor", "Measuring productivity"], "answer": "B", "notes": null},
+                {"question_id": 135381, "question": "Learning a new skill to do fundamentally the same nature of task is called _______", "options": ["Reskilling", "Upskilling", "Semi-skilled", "Technician"], "answer": "B", "notes": null},
+                {"question_id": 135382, "question": "A person’s natural ability to do something is called ______", "options": ["attitude", "adaptability", "aptitude", "acceptance"], "answer": "C", "notes": null},
+                {"question_id": 135383, "question": "Plan, Prepare, Perform is related to ______.", "options": ["your resume", "your work", "attending an interview", "your personality"], "answer": "C", "notes": null},
+                {"question_id": 135384, "question": "Why is a strong work ethic important?", "options": ["More vacations", "Slower work", "Efficient productivity", "Less teamwork"], "answer": "C", "notes": null},
+                {"question_id": 135385, "question": "Which of the following is a good working habit?", "options": ["Complaining about coworkers", "Arriving late to work", "Dressing neatly", "Ignoring tasks"], "answer": "C", "notes": null},
+                {"question_id": 135386, "question": "What is a good habit regarding your behavior towards coworkers?", "options": ["Ignore them", "Complain behind their backs", "Treat them with respect", "Avoid interaction"], "answer": "C", "notes": null},
+                {"question_id": 135387, "question": "___________ is a code of behaviour that is based on respect, values and professionalism.", "options": ["Workplace etiquette", "Business", "Education", "Experience"], "answer": "A", "notes": null},
+                {"question_id": 135388, "question": "What does being punctual at work signify?", "options": ["Carelessness", "Professionalism", "Laziness", "Disinterest"], "answer": "B", "notes": null},
+                {"question_id": 135389, "question": "_______ is when a group of people work together to finish something.", "options": ["Team work", "Business", "Education", "Experience"], "answer": "A", "notes": null},
+                {"question_id": 135390, "question": "Which of the following best describes skills such as commitment, reliability, adaptability and flexibility?", "options": ["Teamwork", "Self-management", "Business", "Education"], "answer": "B", "notes": null},
+                {"question_id": 135391, "question": "________ is always doing our work with dedication and to the best of our ability.", "options": ["Self-management", "Reliability", "Commitment", "Honesty"], "answer": "C", "notes": null},
+                {"question_id": 135392, "question": "What should you avoid in your appearance at work?", "options": ["Wearing clean clothes", "Wrinkled clothes", "Neat appearance", "Proper uniform"], "answer": "B", "notes": null},
+                {"question_id": 135393, "question": "Which of the following is a people skills required in a workplace?", "options": ["Driving skills", "Being kind & Listening", "Technical Skills", "Work alone"], "answer": "B", "notes": null},
+                {"question_id": 135394, "question": "Which of the following ways can help you work well with people?", "options": ["Technical skill", "Not doing any mistakes", "Not talking to coworkers", "Paying attention, staying calm in challenging situations"], "answer": "D", "notes": null},
+                {"question_id": 135395, "question": "Which is a good way to handle when some of your team member made a mistake?", "options": ["Blame the person who did the mistake", "Wait for someone else to solve it", "Discuss and find a way to solve it", "Get angry and scold the team"], "answer": "C", "notes": null},
+                {"question_id": 135396, "question": "While working with your team on a project, one of your coworkers is finding it difficult to finish their job. What should you do in this situation?", "options": ["Finish their work for them.", "Ignore their problem and focus on your own work.", "Complain about them to the boss.", "Help and support them to finish their work."], "answer": "D", "notes": null},
+                {"question_id": 135397, "question": "When your team's project is unsuccessful, what will you do as a leader?", "options": ["Blame the team for the failure", "Encourage learning from mistakes", "Scold them", "Ignore the team members"], "answer": "B", "notes": null},
+                {"question_id": 135398, "question": "What does working well together mean?", "options": ["Be friendly with all", "Not doing any mistakes", "Participate get-together", "Sharing ideas, listening, finding solutions together"], "answer": "D", "notes": null},
+                {"question_id": 135399, "question": "Which of the following behaviours is not a characteristic of a team player?", "options": ["Taking credit for others' work", "Listening to teammates' ideas", "Respecting different viewpoints", "Willingness to help others"], "answer": "A", "notes": null},
+                {"question_id": 135400, "question": "In a team where members have different ideas and there is a disagreement, what should be done?", "options": ["Let them argue", "Choose one idea without discussion", "Discuss both ideas and find a way to make everyone agree", "Ask someone else to decide"], "answer": "C", "notes": null},
+                {"question_id": 135401, "question": "What term describes a person who is always trying out new ways to reuse waste materials?", "options": ["Planner", "Doer", "Idea Person", "Peacekeeper"], "answer": "C", "notes": null},
+                {"question_id": 135402, "question": "Which of these situations show people working well together as a team?", "options": ["Two people arguing and not agreeing", "A group sharing ideas and listening to each other", "One person doing all the work without any help from team members", "All are working without discussing each other"], "answer": "B", "notes": null},
+                {"question_id": 135403, "question": "Which of the following is self-management skills?", "options": ["Listening skill", "Writing skill", "Adaptability and Flexibility", "Speaking skill"], "answer": "C", "notes": null},
+                {"question_id": 135404, "question": "Which of the following best describes the self-management skill of reliability?", "options": ["Not completing tasks on time", "People always trust you to do your job well", "Ignoring the needs of others", "Not being honest with colleagues"], "answer": "B", "notes": null},
+                {"question_id": 135405, "question": "When a machine operator suddenly faces a problem and quickly finds another way to do the work, it is called _________.", "options": ["Honesty", "Adaptability", "Sincerity", "Integrity"], "answer": "B", "notes": null},
+                {"question_id": 135406, "question": "While working in a team, if one of your team members is on leave and hasn't completed their tasks, what should you do?", "options": ["Criticise your coworker for not completing their work.", "Keep working on your own tasks.", "Ask other team members for help and complete your coworker's task.", "Complain to your supervisor about the incomplete work."], "answer": "C", "notes": null},
+                {"question_id": 135407, "question": "While working on a project, you realized that you had made a mistake. What should you do?", "options": ["Blame team members for the mistake", "Wait for someone else to find out about the mistake", "Tell your boss about the mistake", "Ignore the mistake and continue working"], "answer": "C", "notes": null},
+                {"question_id": 135408, "question": "While doing some difficult work, if it is not going on well, what we have to do?", "options": ["Keep trying and look for another way", "Take a break and give up", "Ask someone else to do it for you", "Get upset and quit trying"], "answer": "A", "notes": null},
+                {"question_id": 135409, "question": "While working with a team, if we notice a co-worker struggling with their workload, what should we do?", "options": ["Ignore their struggles and focus on your own work.", "Offer to help them with their tasks.", "Laugh at their inability to manage their workload.", "Report their struggles to the supervisor."], "answer": "B", "notes": null},
+                {"question_id": 135410, "question": "Which of the following is a good work habit?", "options": ["Getting tensed when work is challenging", "Not following workplace rules", "Choosing easy tasks", "Not giving up when something goes wrong"], "answer": "D", "notes": null},
+                {"question_id": 135411, "question": "When we find a faster way to pack products at the factory, what should we do?", "options": ["Pack products faster than our coworkers", "Continue packing the way the team has been doing", "Share the faster packing method with our team", "Keep the method as secret"], "answer": "C", "notes": null},
+                {"question_id": 135412, "question": "As a machine operator, if you find that your machine is not working properly, what should you do?", "options": ["Ignore it", "Try to find the cause and remedies for the problem to solve it", "Blame someone for the defect", "Hide the machine"], "answer": "B", "notes": null},
+                {"question_id": 135413, "question": "Why is it important to think of new ways to solve problems?", "options": ["New ideas can make work easier or faster", "It is fun to try new things", "To waste time", "It is unnecessary to try new things"], "answer": "A", "notes": null},
+                {"question_id": 135414, "question": "What should you do before making a choice at work?", "options": ["Don’t think too much", "Look at the details, listen to others' ideas and choose", "Take immediate decision", "Don’t discuss with others"], "answer": "B", "notes": null},
+                {"question_id": 135415, "question": "While working, it is important to share our ideas with others because _______", "options": ["to make others feel included.", "to show off your knowledge.", "talking can help and make ideas better.", "to impress others."], "answer": "C", "notes": null},
+                {"question_id": 135416, "question": "In a manufacturing unit, the packaging process is taking longer than usual time, causing delays in shipments. What should the workers do?", "options": ["Continue packaging the same way", "Ignore the problem", "Discuss and think about different ways to pack faster", "Complain to the management"], "answer": "C", "notes": null},
+                {"question_id": 135417, "question": "While purchasing an equipment for your trade, how will you make decision?", "options": ["Choose the cheapest machine available", "Look at all the details, think carefully about the needs & budget and then make the choice", "Pick the machine which you like", "Choose the first machine you see"], "answer": "B", "notes": null},
+                {"question_id": 135418, "question": "What are some resource related problems in a workplace?", "options": ["Electricity", "Less operators", "More space for less machines", "Shortage of materials and space"], "answer": "D", "notes": null},
+                {"question_id": 135419, "question": "What are some people related problems in a workplace?", "options": ["More staff in the workplace", "More qualified workers", "More experienced works", "Workers do not communicate while facing the problem"], "answer": "D", "notes": null},
+                {"question_id": 135420, "question": "In an organization where all workers are skilled and working systematically, the outcome will be ________.", "options": ["Loss for the organisation", "Confusion", "Increased output and profit", "Less work gets done"], "answer": "C", "notes": null},
+                {"question_id": 135421, "question": "If a factory manager gets a big order to deliver but there is a shortage of workers, the manager will _______", "options": ["Stop working", "Request workers to work extra hours", "Ignore the problem", "Cancel the orders"], "answer": "B", "notes": null},
+                {"question_id": 135422, "question": "When you do not know how to use a new machine, what will be your action?", "options": ["Ask for help and learn how to use the machine", "Take a break and do it later", "Stay silent till someone teaches you", "Leave the job"], "answer": "A", "notes": null},
+                {"question_id": 135423, "question": "What are the different steps in design thinking?", "options": ["Imagine, Plan and Try", "Try, Create and Decide", "Listen, Choose, Plan, Try, Ask", "Imagine, Decide, Create and Try"], "answer": "C", "notes": null},
+                {"question_id": 135424, "question": "How does design thinking help solve problems?", "options": ["By following a strict process", "By guessing solutions randomly", "By understanding what people need and improving solutions", "By trusting on personal assumptions"], "answer": "C", "notes": null},
+                {"question_id": 135425, "question": "If you come up with an idea to improve the work using design thinking, what should you do next?", "options": ["Write down your idea and keep it safe", "Apply and test if it works", "Tell everyone about it", "Think of another idea"], "answer": "B", "notes": null},
+                {"question_id": 135426, "question": "While purchasing new chairs for students using design thinking, what is the first step to think?", "options": ["Plan how to make the chair", "Think what is student's requirement in a chair", "Choose the colour of the chair", "Test different chair designs"], "answer": "B", "notes": null},
+                {"question_id": 135427, "question": "When a manufacturer is trying to make a better school bag using design thinking, what would be the next step after understanding the students' needs in a bag?", "options": ["Plan different bag designs", "Ask students to test the bags", "Choose the material for the bag", "Choose the colour of the bag"], "answer": "A", "notes": null},
+                {"question_id": 135428, "question": "If your first design of design thinking doesn't work, what should you do?", "options": ["Give up on it", "Ask for feedback and try to improve", "Make something else", "Purchase some other design"], "answer": "B", "notes": null},
+                {"question_id": 135429, "question": "What should a restaurant owner do to attract more customers and improve his business?", "options": ["Guess what customers want and provide it.", "Copy other restaurants and follow.", "Talk to customers, understand their preferences, make changes to the menu, and ask for feedback.", "Randomly select new dishes in the menu"], "answer": "C", "notes": null},
+                {"question_id": 135430, "question": "If you are making a new app for the people, why it is important to test it?", "options": ["To show people how good you are at making apps", "To check if people like the colors and pictures", "Because it's fun to watch others try your app", "To see how people use it and make it better"], "answer": "D", "notes": null},
+                {"question_id": 135431, "question": "A bag manufacturer designs a product and shows it to five different people for feedback. Why is it important to listen to different users and not just one?", "options": ["Because it's fun", "To get a lot of ideas", "To understand the common problems from different users", "To get a lot of appreciation for her work"], "answer": "C", "notes": null},
+                {"question_id": 135432, "question": "Your community wants to reduce plastic waste. How can you use design thinking to find new ideas to solve this problem?", "options": ["Ignore the problem because it's too difficult to solve", "Work together with shops or people nearby to find ways to use less plastic", "Make more things with plastic because they're easy to use", "Blame others for the plastic waste issue"], "answer": "B", "notes": null}
+            ],
+            "Entrepreneurial Skills": [
+                {"question_id": 135433, "question": "A person who is associated with the starting of a business is called _______", "options": ["Merchant", "Entrepreneur", "Businessman", "Sales Executive"], "answer": "B", "notes": null},
+                {"question_id": 135434, "question": "Entrepreneurship is also termed as ______", "options": ["Employer", "Employment seeker", "Self-employment", "Investor"], "answer": "C", "notes": null},
+                {"question_id": 135435, "question": "Believing that you have the capability to achieve your dreams is called ______", "options": ["Self-awareness", "Grit", "Self belief", "Independent decision making"], "answer": "C", "notes": null},
+                {"question_id": 135436, "question": "Working hard to achieve your goals and not giving up when you face failure is called _______", "options": ["Independent decision making", "Self-belief", "Self-awareness", "Grit"], "answer": "D", "notes": null},
+                {"question_id": 135437, "question": "What should a business owner do to retain customers in a competitive market?", "options": ["Lower their prices to match competitors", "Identify and understand their customers' needs and preferences", "Focus solely on superior quality without considering customer feedback", "Offer a wider variety of products without any market research"], "answer": "B", "notes": null},
+                {"question_id": 135438, "question": "Which one is a key skill to be used for a Market survey?", "options": ["Communication", "Computer knowledge", "MBA Degree", "Appearance"], "answer": "A", "notes": null},
+                {"question_id": 135439, "question": "What are three important elements to remember while conducting a survey?", "options": ["Listen, observe, tell", "Observe, record, learn", "Listen, observe, learn", "Talk, learn, understand"], "answer": "C", "notes": null},
+                {"question_id": 135440, "question": "____________ are at the centre of any business.", "options": ["Working capital", "Bank loan", "Licence", "Customers"], "answer": "D", "notes": null},
+                {"question_id": 135441, "question": "Which of the following is a phase that should be completed before starting the promotional campaign?", "options": ["Designing advertisements", "Establishing direct marketing strategies", "Defining the product, its price, and the place of sale", "Planning public relations events"], "answer": "C", "notes": null},
+                {"question_id": 135442, "question": "Taking decisions on your own, after carefully thinking about them is the quality of _______", "options": ["Self-awareness", "Self-belief", "Grit", "Independent decision making"], "answer": "D", "notes": null},
+                {"question_id": 135443, "question": "One important rule to network effectively is ______", "options": ["talk to the same people", "focus on selling your product", "keep in touch with your contacts", "identify your competitors"], "answer": "C", "notes": null},
+                {"question_id": 135444, "question": "If you want to give people relevant information about you and your business in an easy way, you will ______", "options": ["write on a piece of paper and give", "ask them to search on Google", "verbally tell them when they ask", "give them your business card"], "answer": "D", "notes": null},
+                {"question_id": 135445, "question": "Anitha started an Instagram page for her craft business. She used _________ marketing strategy.", "options": ["Online", "Taglines", "Poster", "Networking"], "answer": "A", "notes": null},
+                {"question_id": 135446, "question": "Human resources are __________", "options": ["Human right activists", "your customers", "your staff", "your competitors"], "answer": "C", "notes": null},
+                {"question_id": 135447, "question": "Which of the following is not a resource?", "options": ["Raw materials", "Customer database", "Finished products", "Loss in business"], "answer": "D", "notes": null},
+                {"question_id": 135448, "question": "You are a lifelong learner if you _______", "options": ["get a PhD", "keep growing and adding to your knowledge", "join online courses", "live for a long time"], "answer": "B", "notes": null},
+                {"question_id": 135449, "question": "The activity of setting up a business or businesses, taking on financial risk in the hope of profit is called _________", "options": ["Merchant", "Entrepreneurship", "Bank manager", "Sales executive"], "answer": "B", "notes": null},
+                {"question_id": 135450, "question": "What encourages entrepreneurship on a grand scale?", "options": ["Become rich quickly", "Become famous", "Global leader", "New business opportunities"], "answer": "D", "notes": null},
+                {"question_id": 135451, "question": "Find the Entrepreneur from the given options.", "options": ["RBI Governor", "SBI CEO", "Anand Mahindra", "Cabinet Secretary"], "answer": "C", "notes": null},
+                {"question_id": 135452, "question": "The first version of a product/service is called _______", "options": ["model product", "first initiative", "prototype", "first edition"], "answer": "C", "notes": null},
+                {"question_id": 135453, "question": "What describes \"Human Resources\" in a furniture manufacturing company?", "options": ["its products", "its sales record", "its profit", "its employees"], "answer": "D", "notes": null},
+                {"question_id": 135454, "question": "What is the full form of GST?", "options": ["Government Sales Tax", "Goods Sales Tax", "Goods and Services Tax", "Government Service Tax"], "answer": "C", "notes": null},
+                {"question_id": 135455, "question": "What is required to gather feedback from your customers?", "options": ["Advertisement on TV", "Brochure", "Billboards", "Market survey"], "answer": "D", "notes": null},
+                {"question_id": 135456, "question": "An entrepreneurial mindset means to _______", "options": ["identify opportunities and Use them for your benefit", "not taking any risk", "not setting any goal", "think only about profit"], "answer": "A", "notes": null},
+                {"question_id": 135457, "question": "What does it mean to think like a business person?", "options": ["Only thinking about money", "Being scared to try new things", "Seeing problems as things to fix", "Not liking change"], "answer": "C", "notes": null},
+                {"question_id": 135458, "question": "If you face a problem, which of the following entrepreneurial mindset traits would be most helpful?", "options": ["Waiting until everything is perfect to do something", "Taking action to solve the problem", "Ignoring the problem and hoping it goes away", "Blaming others for the problem"], "answer": "B", "notes": null},
+                {"question_id": 135459, "question": "If someone wants to sell homemade products, what do they have to do to grow the business?", "options": ["Find shopkeepers and build marketing relationships with them.", "Keep doing the same thing without any changes.", "Wait for an opportunity to grow the business.", "Sell only to neighbors."], "answer": "A", "notes": null},
+                {"question_id": 135460, "question": "If your coworkers don't agree with your project idea, what's a good way to handle it with an entrepreneurial mindset?", "options": ["Give up on your idea", "Stop talking about it", "Ask for feedback and make your idea better with their help", "Stick to your idea without listening to others"], "answer": "C", "notes": null},
+                {"question_id": 135461, "question": "Why is it important to have a business plan before starting a business?", "options": ["To get loan from bank", "To show you are an entrepreneur", "To identify potential challenges with clear goal and risks", "Just a try"], "answer": "C", "notes": null},
+                {"question_id": 135462, "question": "Imagine you are setting up a mobile repair shop. Which of the following is the most important for its success?", "options": ["Setting up the shop in a busy area", "Offering repair services at a higher price", "Putting up flyers in the neighbourhood", "Picking the right shop name"], "answer": "A", "notes": null},
+                {"question_id": 135463, "question": "While making a business plan, which is not required to be mentioned?", "options": ["Business idea", "Startup costs", "Future growth strategies", "Personal interests and hobbies"], "answer": "D", "notes": null},
+                {"question_id": 135464, "question": "If someone wants to apply for bank loan for their business, their business plan should have ________.", "options": ["only the idea and name of the business", "the total cost of the business without any details", "challenges about the business along with solutions", "business profit details"], "answer": "C", "notes": null},
+                {"question_id": 135465, "question": "If you want to start a bakery business, what would you focus on first in your business plan?", "options": ["Selecting a catchy name for the bakery", "Calculating how much money you need to start the business", "Planning how to advertise the bakery on social media", "Figuring out how the business will grow"], "answer": "B", "notes": null},
+                {"question_id": 135466, "question": "While presenting your business plan to audience, how will you engage them to connect with you?", "options": ["Practice until you can confidently present your plan", "Repeat yourself multiple times", "Share a story or an experience that shaped your idea", "Avoid eye contact with the audience"], "answer": "C", "notes": null},
+                {"question_id": 135467, "question": "When presenting your business plan to a potential investor, you should be clear about ________", "options": ["staff strength", "expected profit", "bank loan", "investment, expected customers, potential earnings"], "answer": "D", "notes": null},
+                {"question_id": 135468, "question": "While talking about your business plan to the audience, how will you make them understand your product better?", "options": ["Repeat your explanation multiple times", "Give demo of the product/service", "Share overall business costs", "Tell a joke"], "answer": "B", "notes": null},
+                {"question_id": 135469, "question": "While presenting your business plan to potential investors, why is it important to actively listen to their questions and provide thoughtful answers?", "options": ["To show off your expertise", "To avoid eye contact", "To understand the concerns of the investors and build their confidence in your plan", "To show your communication skills"], "answer": "C", "notes": null},
+                {"question_id": 135470, "question": "When someone needs funding for a small business, what should they do to find a suitable investor?", "options": ["Start without funding and hope for an investor.", "Attend networking events to meet suitable investors.", "Send business plan to friends", "Wait for the suitable investor"], "answer": "B", "notes": null}
+            ]
+        };
+
+        class App {
+            constructor() {
+                this.selectedTopics = new Set();
+                this.mode = 'exam';
+                this.questions = [];
+                this.currentIndex = 0;
+                this.userAnswers = {};
+                this.flagged = new Set();
+                this.timerInterval = null;
+                this.timeElapsed = 0;
+                this.history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+                this.initStats();
+            }
+
+            initStats() {
+                let totalQ = 0;
+                let topicCount = Object.keys(QUIZ_DATA).length;
+                Object.values(QUIZ_DATA).forEach(list => totalQ += list.length);
+
+                document.getElementById('stat-total').innerText = totalQ;
+                document.getElementById('stat-topics').innerText = topicCount;
+                document.getElementById('stat-tests').innerText = this.history.length;
+            }
+
+            showScreen(id) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                window.scrollTo(0, 0);
+            }
+
+            goHome() {
+                this.initStats();
+                this.showScreen('screen-home');
+            }
+
+            goToTopics() {
+                const list = document.getElementById('topic-list');
+                list.innerHTML = '';
+                Object.keys(QUIZ_DATA).forEach(topic => {
+                    const count = QUIZ_DATA[topic].length;
+                    const isChecked = this.selectedTopics.has(topic);
+                    const div = document.createElement('div');
+                    div.className = 'topic-item';
+                    div.onclick = () => this.toggleTopic(topic);
+                    div.innerHTML = `
+                        <div style="display:flex;align-items:center">
+                            <div class="topic-checkbox ${isChecked ? 'checked' : ''}">${isChecked ? '✓' : ''}</div>
+                            <div class="topic-info">
+                                <h3>${topic}</h3>
+                                <span>${count} questions</span>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+                this.updateTopicSelectionCount();
+                this.showScreen('screen-topics');
+            }
+
+            toggleTopic(topic) {
+                if (this.selectedTopics.has(topic)) {
+                    this.selectedTopics.delete(topic);
+                } else {
+                    this.selectedTopics.add(topic);
+                }
+                this.goToTopics();
+            }
+
+            toggleSelectAll() {
+                const allTopics = Object.keys(QUIZ_DATA);
+                if (this.selectedTopics.size === allTopics.length) {
+                    this.selectedTopics.clear();
+                } else {
+                    allTopics.forEach(t => this.selectedTopics.add(t));
+                }
+                this.goToTopics();
+            }
+
+            setMode(mode, el) {
+                this.mode = mode;
+                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            updateTopicSelectionCount() {
+                let qCount = 0;
+                this.selectedTopics.forEach(t => qCount += QUIZ_DATA[t].length);
+                document.getElementById('selected-count').innerText = this.selectedTopics.size;
+                document.getElementById('selected-questions').innerText = qCount;
+                document.getElementById('start-test-btn').disabled = this.selectedTopics.size === 0;
+            }
+
+            startTest() {
+                this.questions = [];
+                this.selectedTopics.forEach(topic => {
+                    this.questions.push(...QUIZ_DATA[topic]);
+                });
+                
+                // Shuffle questions in exam mode
+                if (this.mode === 'exam') {
+                    this.questions.sort(() => Math.random() - 0.5);
+                }
+
+                this.currentIndex = 0;
+                this.userAnswers = {};
+                this.flagged.clear();
+                this.timeElapsed = 0;
+
+                document.getElementById('q-total').innerText = this.questions.length;
+                this.startTimer();
+                this.renderQuestion();
+                this.showScreen('screen-test');
+            }
+
+            startTimer() {
+                clearInterval(this.timerInterval);
+                const timerEl = document.getElementById('timer');
+                this.timerInterval = setInterval(() => {
+                    this.timeElapsed++;
+                    const mins = String(Math.floor(this.timeElapsed / 60)).padStart(2, '0');
+                    const secs = String(this.timeElapsed % 60).padStart(2, '0');
+                    timerEl.innerText = `${mins}:${secs}`;
+                }, 1000);
+            }
+
+            renderQuestion() {
+                const q = this.questions[this.currentIndex];
+                const container = document.getElementById('question-container');
+                document.getElementById('q-current').innerText = this.currentIndex + 1;
+                document.getElementById('progress-fill').style.width = `${((this.currentIndex + 1) / this.questions.length) * 100}%`;
+
+                document.getElementById('flag-btn').classList.toggle('flagged', this.flagged.has(this.currentIndex));
+
+                let optionsHTML = '';
+                const letters = ['A', 'B', 'C', 'D'];
+                q.options.forEach((opt, idx) => {
+                    const letter = letters[idx];
+                    let stateClass = '';
+                    
+                    if (this.userAnswers[this.currentIndex] === letter) {
+                        stateClass = 'selected';
+                    }
+
+                    if (this.mode === 'practice' && this.userAnswers[this.currentIndex]) {
+                        if (letter === q.answer) stateClass = 'correct';
+                        else if (this.userAnswers[this.currentIndex] === letter) stateClass = 'wrong';
+                        else stateClass = 'disabled';
+                    }
+
+                    optionsHTML += `
+                        <button class="option ${stateClass}" onclick="app.selectOption('${letter}')">
+                            <span class="option-letter">${letter}</span>
+                            <span class="option-text">${opt}</span>
+                        </button>
+                    `;
+                });
+
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-number">Question ${this.currentIndex + 1}</span>
+                        <div class="question-text">${q.question}</div>
+                        <div class="options-list">${optionsHTML}</div>
+                    </div>
+                `;
+
+                document.getElementById('prev-btn').disabled = this.currentIndex === 0;
+                document.getElementById('next-btn').innerText = this.currentIndex === this.questions.length - 1 ? 'Finish' : 'Next →';
+            }
+
+            selectOption(letter) {
+                if (this.mode === 'practice' && this.userAnswers[this.currentIndex]) return;
+                this.userAnswers[this.currentIndex] = letter;
+                this.renderQuestion();
+            }
+
+            prevQuestion() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.renderQuestion();
+                }
+            }
+
+            nextQuestion() {
+                if (this.currentIndex < this.questions.length - 1) {
+                    this.currentIndex++;
+                    this.renderQuestion();
+                } else {
+                    this.confirmEnd();
+                }
+            }
+
+            toggleFlag() {
+                if (this.flagged.has(this.currentIndex)) {
+                    this.flagged.delete(this.currentIndex);
+                } else {
+                    this.flagged.add(this.currentIndex);
+                }
+                document.getElementById('flag-btn').classList.toggle('flagged', this.flagged.has(this.currentIndex));
+            }
+
+            togglePalette() {
+                const overlay = document.getElementById('palette-overlay');
+                const active = overlay.classList.toggle('active');
+                if (active) {
+                    const grid = document.getElementById('palette-grid');
+                    grid.innerHTML = '';
+                    this.questions.forEach((_, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'palette-item';
+                        if (this.userAnswers[idx]) item.classList.add('answered');
+                        if (this.flagged.has(idx)) item.classList.add('flagged');
+                        if (idx === this.currentIndex) item.classList.add('current');
+                        item.innerText = idx + 1;
+                        item.onclick = () => {
+                            this.currentIndex = idx;
+                            this.renderQuestion();
+                            this.togglePalette();
+                        };
+                        grid.appendChild(item);
+                    });
+                }
+            }
+
+            confirmEnd() {
+                if (confirm("Are you sure you want to end the test?")) {
+                    this.endTest();
+                }
+            }
+
+            endTest() {
+                clearInterval(this.timerInterval);
+
+                let correct = 0;
+                let wrong = 0;
+                let skipped = 0;
+
+                this.questions.forEach((q, idx) => {
+                    const ans = this.userAnswers[idx];
+                    if (!ans) skipped++;
+                    else if (ans === q.answer) correct++;
+                    else wrong++;
+                });
+
+                const total = this.questions.length;
+                const percentage = Math.round((correct / total) * 100) || 0;
+
+                document.getElementById('result-score').innerText = `${percentage}%`;
+                document.getElementById('result-correct').innerText = correct;
+                document.getElementById('result-wrong').innerText = wrong;
+                document.getElementById('result-skipped').innerText = skipped;
+
+                const mins = String(Math.floor(this.timeElapsed / 60)).padStart(2, '0');
+                const secs = String(this.timeElapsed % 60).padStart(2, '0');
+                document.getElementById('result-time').innerText = `${mins}:${secs}`;
+
+                const isPass = percentage >= 60;
+                const badge = document.getElementById('pass-badge');
+                badge.innerText = isPass ? 'PASS' : 'FAIL';
+                badge.className = `pass-badge ${isPass ? 'pass' : 'fail'}`;
+
+                document.getElementById('result-message').innerText = isPass ? 'Great job! Excellent performance!' : 'Keep practicing to improve!';
+
+                // Save result to local history
+                this.history.unshift({
+                    date: new Date().toLocaleDateString(),
+                    score: percentage,
+                    total: total,
+                    correct: correct
+                });
+                localStorage.setItem('quiz_history', JSON.stringify(this.history));
+
+                this.showScreen('screen-results');
+            }
+
+            goToReview() {
+                const container = document.getElementById('review-container');
+                container.innerHTML = '';
+
+                const letters = ['A', 'B', 'C', 'D'];
+                this.questions.forEach((q, idx) => {
+                    const userAns = this.userAnswers[idx];
+                    const isCorrect = userAns === q.answer;
+                    const statusClass = !userAns ? 'skipped' : isCorrect ? 'correct' : 'wrong';
+                    const statusText = !userAns ? 'Skipped' : isCorrect ? 'Correct' : 'Wrong';
+
+                    let optionsHTML = '';
+                    q.options.forEach((opt, oIdx) => {
+                        const letter = letters[oIdx];
+                        let optClass = '';
+                        if (letter === q.answer) optClass = 'correct';
+                        else if (userAns === letter) optClass = 'wrong';
+
+                        optionsHTML += `
+                            <div class="option ${optClass}" style="cursor:default">
+                                <span class="option-letter">${letter}</span>
+                                <span class="option-text">${opt}</span>
+                            </div>
+                        `;
+                    });
+
+                    const card = document.createElement('div');
+                    card.className = `review-card ${statusClass}`;
+                    card.innerHTML = `
+                        <div class="review-status ${statusClass}">${statusText}</div>
+                        <div style="font-weight:700;margin-bottom:8px">Q${idx + 1}. ${q.question}</div>
+                        <div class="options-list">${optionsHTML}</div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                this.showScreen('screen-review');
+            }
+
+            goToResults() {
+                this.showScreen('screen-results');
+            }
+
+            goToHistory() {
+                const container = document.getElementById('history-container');
+                if (this.history.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>No tests taken yet. Start your first mock test!</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '';
+                    this.history.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+                        div.innerHTML = `
+                            <div>
+                                <div class="history-score">${item.score}%</div>
+                                <div class="history-date">${item.date}</div>
+                            </div>
+                            <div style="font-size:0.875rem;color:var(--text-secondary)">
+                                ${item.correct} / ${item.total} Correct
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+                this.showScreen('screen-history');
+            }
+        }
+
+        const app = new App();
+    </script>
+</body>
+</html>
